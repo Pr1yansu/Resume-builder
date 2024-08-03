@@ -2,7 +2,12 @@ import React, { Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "@/components/navbar/navbar";
 import Loader from "@/components/loader/loader";
+import AuthGuard from "@/guard/auth-guard";
+import LoginGuard from "./guard/login-guard";
 const Home = React.lazy(() => import("@/pages/home"));
+const Builder = React.lazy(() => import("@/pages/builder"));
+const Login = React.lazy(() => import("@/pages/login"));
+const Dashboard = React.lazy(() => import("@/pages/dashboard"));
 
 const App = () => {
   useEffect(() => {
@@ -42,6 +47,38 @@ const App = () => {
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route
+            path="/login"
+            element={
+              <LoginGuard>
+                <Login />
+              </LoginGuard>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <LoginGuard>
+                <Login />
+              </LoginGuard>
+            }
+          />
+          <Route
+            path="/builder"
+            element={
+              <AuthGuard>
+                <Builder />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <AuthGuard>
+                <Dashboard />
+              </AuthGuard>
+            }
+          />
         </Routes>
       </Suspense>
     </BrowserRouter>

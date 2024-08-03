@@ -1,7 +1,18 @@
-import Image from "../image/image";
-import { Link } from "react-router-dom";
+import Image from "@/components/image/image";
+import { Link, useLocation } from "react-router-dom";
+const hiddenPages = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/dashboard",
+  "/builder",
+];
 
 const Navbar = () => {
+  const location = useLocation();
+  if (hiddenPages.includes(location.pathname)) {
+    return null;
+  }
   return (
     <div className="fixed top-0 left-0 right-0 p-2 z-50">
       <header className="container">
