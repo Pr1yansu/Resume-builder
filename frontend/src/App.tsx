@@ -64,7 +64,15 @@ const App = () => {
             }
           />
           <Route
-            path="/builder"
+            path="/builder/create"
+            element={
+              <AuthGuard>
+                <Builder />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/builder/update"
             element={
               <AuthGuard>
                 <Builder />

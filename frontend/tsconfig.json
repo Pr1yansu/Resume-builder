@@ -11,6 +11,7 @@
   "compilerOptions": {
     "strict": true,
     "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

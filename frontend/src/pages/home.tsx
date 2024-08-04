@@ -42,7 +42,7 @@ const Home = () => {
             </p>
             <div className="flex items-center mt-4">
               <Button>
-                <Link to="/builder">Get Started</Link>
+                <Link to="/dashboard">Get Started</Link>
               </Button>
               <Button variant="outline" className="ml-2">
                 <Link to="/learn-more" className="flex items-center">

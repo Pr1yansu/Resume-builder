@@ -18,13 +18,13 @@ const VanishingCarousel = ({
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const totalWidth = ref.current ? ref.current.scrollWidth / 2 : 0;
+    const totalWidth = ref.current ? ref.current.scrollWidth / 3 : 0;
     controls.start({
       x: [0, -totalWidth],
       transition: {
         x: {
           repeat: Infinity,
-          repeatType: "loop",
+          repeatType: "reverse",
           duration: 10,
           ease: "linear",
         },
