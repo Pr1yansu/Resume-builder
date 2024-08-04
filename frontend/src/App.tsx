@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "@/components/navbar/navbar";
 import Loader from "@/components/loader/loader";
 import AuthGuard from "@/guard/auth-guard";
-import LoginGuard from "./guard/login-guard";
+import LoginGuard from "@/guard/login-guard";
 const Home = React.lazy(() => import("@/pages/home"));
 const Builder = React.lazy(() => import("@/pages/builder"));
 const Login = React.lazy(() => import("@/pages/login"));
