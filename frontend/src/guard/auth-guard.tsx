@@ -9,11 +9,11 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     return <Loader />;
   }
   if (error) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" />;
   }
   const user = data?.user;
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" />;
   }
   return <>{children}</>;
 };

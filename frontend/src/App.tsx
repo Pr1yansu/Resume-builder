@@ -43,8 +43,8 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <Navbar />
       <Suspense fallback={<Loader />}>
+        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
