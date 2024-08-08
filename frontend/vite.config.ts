@@ -5,6 +5,7 @@ import { defineConfig, loadEnv } from "vite";
 export default defineConfig(({ mode }) => {
   process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
   const API_URL = process.env.VITE_API_URL;
+  const VITE_PORT = process.env.VITE_PORT;
   return {
     plugins: [react()],
     resolve: {
@@ -13,6 +14,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      port: VITE_PORT ? parseInt(VITE_PORT) : 3000,
       proxy: {
         "/api": {
           target: API_URL,
