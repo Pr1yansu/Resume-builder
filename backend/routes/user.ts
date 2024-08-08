@@ -31,16 +31,39 @@ router.get(
   }
 );
 
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    failureRedirect: process.env.CLIENT_URL! + "/login",
-    failureMessage: true,
-  }),
-  (req, res) => {
-    res.redirect(process.env.CLIENT_URL!);
-  }
-);
+router.post("/login", function (req, res, next) {
+  passport.authenticate(
+    "local",
+    function (
+      err: Error | null,
+      user: Express.User | null,
+      info: { message: string }
+    ) {
+      if (err) {
+        return res
+          .status(500)
+          .json({ message: "Server Error", status: 500, redirect: "/login" });
+      }
+      if (!user) {
+        return res
+          .status(401)
+          .json({ message: info.message, status: 401, redirect: "/login" });
+      }
+      req.logIn(user, function (err) {
+        if (err) {
+          return res
+            .status(500)
+            .json({ message: "Server Error", status: 500, redirect: "/login" });
+        }
+        return res.status(200).json({
+          message: "Login Success",
+          status: 200,
+          redirect: "/dashboard",
+        });
+      });
+    }
+  )(req, res, next);
+});
 
 router.post("/register", create);
 

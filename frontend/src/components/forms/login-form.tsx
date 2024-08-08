@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLoginMutation } from "@/services/user";
 import { useState } from "react";
 
@@ -21,6 +21,7 @@ const loginFormSchema = z.object({
 });
 
 const LoginForm = ({ holding }: { holding: boolean }) => {
+  const navigate = useNavigate();
   const [login] = useLoginMutation();
   const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof loginFormSchema>>({
@@ -34,17 +35,19 @@ const LoginForm = ({ holding }: { holding: boolean }) => {
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     try {
       setLoading(true);
-      const { message, status } = await login({
+      const { message, status, redirect } = await login({
         password: values.password,
         username: values.search,
       }).unwrap();
       if (status === 200) {
         console.log("Login Success");
+        navigate(redirect);
         return;
       }
+      navigate(redirect);
       console.log(message);
     } catch (error) {
-      console.error(error);
+      console.log(error);
     } finally {
       setLoading(false);
     }

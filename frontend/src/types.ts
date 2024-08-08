@@ -20,10 +20,12 @@ export interface UserLogin {
 export interface UserLoginResponse {
   message: string;
   status: number;
+  redirect: string;
 }
 export interface UserDetailResponse {
   message: string;
   status: number;
+  redirect: string;
   user?: {
     id: string;
     email: string;

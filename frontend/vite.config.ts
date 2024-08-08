@@ -13,11 +13,11 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      cors: false,
       proxy: {
         "/api": {
           target: API_URL,
           changeOrigin: true,
+          followRedirects: true,
           secure: false,
         },
       },

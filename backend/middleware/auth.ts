@@ -15,7 +15,9 @@ export const checkAuthenticated = (
   if (req.isAuthenticated()) {
     return next();
   }
-  return res.redirect(process.env.CLIENT_URL! + "/login");
+  return res
+    .status(401)
+    .json({ message: "You need to login first", redirect: "/login" });
 };
 
 export const checkRole = (role: string) => {
