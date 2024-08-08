@@ -52,7 +52,7 @@ const Home = () => {
               </Button>
             </div>
           </div>
-          <div className="p-4 w-1/2 flex justify-center items-center">
+          <div className="p-4 w-1/2 flex justify-end items-center">
             <Card3D className="w-[90%] shadow-lg shadow-zinc-400">
               <Image
                 src={"/resume.jpg"}

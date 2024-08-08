@@ -7,21 +7,25 @@ import User from "../schema/user";
 
 passport.use(
   new LocalStrategy(async function (username, password, done) {
-    const user = await User.findOne({
-      $or: [{ email: username }, { name: username }],
-    });
+    try {
+      const user = await User.findOne({
+        $or: [{ email: username }, { name: username }],
+      });
 
-    if (!user) {
-      return done(null, false, { message: "Incorrect username." });
+      if (!user) {
+        return done(null, false, { message: "User not found or not exists" });
+      }
+
+      const isMatch = await user.comparePassword(password);
+
+      if (!isMatch) {
+        return done(null, false, { message: "Incorrect credentials." });
+      }
+
+      return done(null, user);
+    } catch (error) {
+      return done(null, false, { message: "Server Error" });
     }
-
-    const isMatch = await user.comparePassword(password);
-
-    if (!isMatch) {
-      return done(null, false, { message: "Incorrect password." });
-    }
-
-    return done(null, user);
   })
 );
 

@@ -8,6 +8,7 @@ import cors from "cors";
 import passport from "passport";
 import expressSession from "express-session";
 import userRoutes from "./routes/user";
+import morgan from "morgan";
 import "./config/passport";
 
 connectDB();
@@ -15,19 +16,29 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: function (origin, callback) {
+      if (process.env.WHITELIST!.indexOf(origin!) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+app.use(morgan("dev"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(
   expressSession({
     secret: process.env.SESSION_SECRET as string,
-    resave: true,
+    resave: false,
     saveUninitialized: true,
+    cookie: {
+      secure: false,
+    },
   })
 );
 app.use(passport.initialize());

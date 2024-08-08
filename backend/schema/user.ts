@@ -6,11 +6,14 @@ enum UserRole {
   ADMIN = "admin",
 }
 
-interface UserDocument extends Document {
+export interface UserDocument extends Document {
   email: string;
   password: string;
   avatar?: string;
   emailVerified: boolean;
+  provider?: string;
+  googleId?: string;
+  address?: string;
   name: string;
   role: UserRole;
   roleVerified: boolean;

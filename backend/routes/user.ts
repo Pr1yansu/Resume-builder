@@ -35,22 +35,23 @@ router.post(
   "/login",
   passport.authenticate("local", {
     failureRedirect: process.env.CLIENT_URL! + "/login",
+    failureMessage: true,
   }),
   (req, res) => {
     res.redirect(process.env.CLIENT_URL!);
   }
 );
 
-router.get("/create", create);
+router.post("/register", create);
 
 router.get("/profile", checkAuthenticated, profile);
 
-router.get("/profile", checkAuthenticated, verifyMail);
+router.get("/verify-mail", verifyMail);
 
 router.get("/logout", (req, res) => {
   req.logOut(function (err) {
     if (err) {
-      return res.status(500).json({ message: "Server Error" });
+      return res.status(500).json({ message: "Server Error", status: 500 });
     }
   });
   return res.redirect(process.env.CLIENT_URL!);

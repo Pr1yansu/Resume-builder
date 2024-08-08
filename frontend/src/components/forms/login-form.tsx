@@ -12,13 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useLoginMutation } from "@/services/user";
+import { useState } from "react";
 
 const loginFormSchema = z.object({
   search: z.string().min(2).max(255),
-  password: z.string().min(8),
+  password: z.string().min(4),
 });
 
 const LoginForm = ({ holding }: { holding: boolean }) => {
+  const [login] = useLoginMutation();
+  const [loading, setLoading] = useState(false);
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
@@ -27,8 +31,23 @@ const LoginForm = ({ holding }: { holding: boolean }) => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof loginFormSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof loginFormSchema>) {
+    try {
+      setLoading(true);
+      const { message, status } = await login({
+        password: values.password,
+        username: values.search,
+      }).unwrap();
+      if (status === 200) {
+        console.log("Login Success");
+        return;
+      }
+      console.log(message);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -76,6 +95,7 @@ const LoginForm = ({ holding }: { holding: boolean }) => {
         <div className="pt-8 flex gap-2">
           <Button
             type="submit"
+            disabled={loading}
             className="w-full bg-white text-black hover:bg-white/90"
           >
             Sign in
@@ -83,6 +103,7 @@ const LoginForm = ({ holding }: { holding: boolean }) => {
           <Link to="/forgot-password" className="w-full">
             <Button
               type="button"
+              disabled={loading}
               className=" bg-black text-white hover:bg-black/90"
             >
               Forgot Password?

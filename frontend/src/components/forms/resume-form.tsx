@@ -98,7 +98,10 @@ const AvatarSettings = ({ control }: { control: Control<FormValues> }) => (
                                 ? "bg-slate-300"
                                 : "bg-accent"
                             )}
-                            onClick={() => field.onChange(value)}
+                            onClick={() =>
+                              field.onChange(field.value === value ? "" : value)
+                            }
+                            onDoubleClick={() => field.onChange("")}
                           />
                         ))}
                       </div>
@@ -125,13 +128,19 @@ const ResumeForm = ({
     resolver: zodResolver(schema),
     defaultValues: resume || {
       name: "",
+      avatar: {
+        url: "",
+        alt: "",
+        size: 100,
+        aspectRatio: "SQUARE",
+        borderRadius: "NONE",
+        effects: "HIDDEN",
+      },
     },
   });
-
   const onSubmit = async (values: FormValues) => {
     console.log(values);
   };
-
   return (
     <div className="p-6 w-full">
       <Form {...form}>

@@ -11,12 +11,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCreateUserMutation, useLoginMutation } from "@/services/user";
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 const registerFormSchema = z.object({
-  username: z.string().min(2).max(255),
+  name: z.string().min(2).max(255),
   email: z.string().email(),
-  password: z.string().min(8),
-  confirmPassword: z.string().min(8),
+  password: z.string().min(4),
+  confirmPassword: z.string().min(4),
+  address: z.string().min(4),
 });
 
 const RegisterForm = ({
@@ -26,18 +30,42 @@ const RegisterForm = ({
   holding: boolean;
   setTab: React.Dispatch<React.SetStateAction<"login" | "register">>;
 }) => {
+  const [createUser] = useCreateUserMutation();
+  const [login] = useLoginMutation();
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof registerFormSchema>>({
     resolver: zodResolver(registerFormSchema),
     defaultValues: {
-      username: "",
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
+      address: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof registerFormSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof registerFormSchema>) {
+    try {
+      setLoading(true);
+      const response = await createUser(values).unwrap();
+      if (response.status === 201) {
+        const { data } = await login({
+          password: values.password,
+          username: values.email,
+        });
+        if (data?.status === 200) {
+          console.log("Login Success");
+          return;
+        }
+        throw new Error(data?.message);
+      }
+      throw new Error(response.message);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -45,7 +73,7 @@ const RegisterForm = ({
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 py-8">
         <FormField
           control={form.control}
-          name="username"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Username</FormLabel>
@@ -113,10 +141,28 @@ const RegisterForm = ({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Address</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="address"
+                  {...field}
+                  className="bg-black text-white border-zinc-700 placeholder:text-zinc-700"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <div className="pt-8 flex gap-2">
           <Button
             type="submit"
             className="w-full bg-white text-black hover:bg-white/90"
+            disabled={loading}
           >
             Register
           </Button>
@@ -124,6 +170,7 @@ const RegisterForm = ({
             type="button"
             className="w-full bg-black text-white hover:bg-black/90"
             onClick={() => setTab("login")}
+            disabled={loading}
           >
             Already have an account?
           </Button>

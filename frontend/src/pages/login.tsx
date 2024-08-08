@@ -107,7 +107,11 @@ const Login = () => {
           </div>
         </div>
         <div className="w-full bg-white">
-          <Image src="/login.jpg" alt="login" className="w-full" />
+          <Image
+            src="/login.jpg"
+            alt="login"
+            className="w-full h-full object-cover object-center"
+          />
         </div>
       </div>
     </section>

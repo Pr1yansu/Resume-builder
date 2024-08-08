@@ -5,14 +5,15 @@ const hiddenPages = [
   "/register",
   "/forgot-password",
   "/dashboard",
-  "/builder",
+  "/builder/*",
 ];
 
 const Navbar = () => {
   const location = useLocation();
-  if (hiddenPages.includes(location.pathname)) {
-    return null;
-  }
+  const hidden = hiddenPages.some((path) =>
+    new RegExp(path).test(location.pathname)
+  );
+  if (hidden) return null;
   return (
     <div className="fixed top-0 left-0 right-0 p-2 z-50">
       <header className="container">

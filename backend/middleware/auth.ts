@@ -1,11 +1,9 @@
 import type { NextFunction, Request, Response } from "express";
+import type { UserDocument } from "../schema/user";
 
 declare global {
   namespace Express {
-    interface User {
-      role: string;
-      id: string;
-    }
+    interface User extends UserDocument {}
   }
 }
 
