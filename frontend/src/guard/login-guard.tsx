@@ -12,7 +12,7 @@ const LoginGuard = ({ children }: { children: React.ReactNode }) => {
   }
   const user = data?.user;
   if (user) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/dashboard" replace />;
   }
   return <>{children}</>;
 };

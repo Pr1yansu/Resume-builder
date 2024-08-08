@@ -2,8 +2,8 @@ import React, { Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "@/components/navbar/navbar";
 import Loader from "@/components/loader/loader";
-import AuthGuard from "@/guard/auth-guard";
-import LoginGuard from "@/guard/login-guard";
+// import AuthGuard from "@/guard/auth-guard";
+// import LoginGuard from "@/guard/login-guard";
 const Home = React.lazy(() => import("@/pages/home"));
 const Builder = React.lazy(() => import("@/pages/builder"));
 const Login = React.lazy(() => import("@/pages/login"));
@@ -43,50 +43,15 @@ const App = () => {
 
   return (
     <BrowserRouter>
+      <Navbar />
       <Suspense fallback={<Loader />}>
-        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/login"
-            element={
-              <LoginGuard>
-                <Login />
-              </LoginGuard>
-            }
-          />
-          <Route
-            path="/forgot-password"
-            element={
-              <LoginGuard>
-                <Login />
-              </LoginGuard>
-            }
-          />
-          <Route
-            path="/builder/create"
-            element={
-              <AuthGuard>
-                <Builder />
-              </AuthGuard>
-            }
-          />
-          <Route
-            path="/builder/update"
-            element={
-              <AuthGuard>
-                <Builder />
-              </AuthGuard>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <AuthGuard>
-                <Dashboard />
-              </AuthGuard>
-            }
-          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<Login />} />
+          <Route path="/builder/create" element={<Builder />} />
+          <Route path="/builder/update" element={<Builder />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
