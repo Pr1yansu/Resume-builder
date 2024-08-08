@@ -4,10 +4,10 @@ import Navbar from "@/components/navbar/navbar";
 import Loader from "@/components/loader/loader";
 // import AuthGuard from "@/guard/auth-guard";
 // import LoginGuard from "@/guard/login-guard";
-const Home = React.lazy(() => import("@/pages/home"));
-const Builder = React.lazy(() => import("@/pages/builder"));
-const Login = React.lazy(() => import("@/pages/login"));
-const Dashboard = React.lazy(() => import("@/pages/dashboard"));
+const Home = React.lazy(() => import("./pages/home"));
+const Builder = React.lazy(() => import("./pages/builder"));
+const Login = React.lazy(() => import("./pages/login"));
+const Dashboard = React.lazy(() => import("./pages/dashboard"));
 
 const App = () => {
   useEffect(() => {
