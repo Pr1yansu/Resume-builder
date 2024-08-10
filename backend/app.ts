@@ -7,8 +7,9 @@ import connectDB from "./config/db";
 import cors from "cors";
 import passport from "passport";
 import expressSession from "express-session";
-import userRoutes from "./routes/user";
 import morgan from "morgan";
+import MongoStore from "connect-mongo";
+import userRoutes from "./routes/user";
 import "./config/passport";
 
 connectDB();
@@ -42,6 +43,10 @@ app.use(
     secret: process.env.SESSION_SECRET as string,
     resave: false,
     saveUninitialized: true,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI as string,
+      collectionName: "sessions",
+    }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
@@ -49,7 +54,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24,
       priority: "high",
     },
-    proxy: true,
+    proxy: process.env.NODE_ENV === "production",
   })
 );
 app.use(passport.initialize());
