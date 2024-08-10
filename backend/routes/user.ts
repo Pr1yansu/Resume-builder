@@ -55,7 +55,9 @@ router.post("/login", function (req, res, next) {
             .status(500)
             .json({ message: "Server Error", status: 500, redirect: "/login" });
         }
-        res.redirect(process.env.CLIENT_URL! + "/dashboard");
+        return res
+          .status(200)
+          .json({ message: "Success", status: 200, redirect: "/dashboard" });
       });
     }
   )(req, res, next);

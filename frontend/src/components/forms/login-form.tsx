@@ -41,6 +41,7 @@ const LoginForm = ({ holding }: { holding: boolean }) => {
       }).unwrap();
       if (status === 200) {
         console.log("Login Success");
+        navigate(redirect);
         return;
       }
       navigate(redirect);
