@@ -27,6 +27,7 @@ const userApi = createApi({
         method: "POST",
         body,
         credentials: "include",
+        redirect: "follow",
       }),
     }),
     profile: builder.query<UserDetailResponse, void>({
@@ -34,6 +35,7 @@ const userApi = createApi({
         url: "/profile",
         method: "GET",
         credentials: "include",
+        redirect: "follow",
       }),
       providesTags: ["User"],
     }),
