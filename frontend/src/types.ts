@@ -37,3 +37,13 @@ export interface UserDetailResponse {
     role: UserRole;
   };
 }
+
+export interface ResumeNameSlug {
+  name: string;
+  slug: string;
+}
+
+export interface ResumeNameSlugResponse {
+  message: string;
+  status: number;
+}

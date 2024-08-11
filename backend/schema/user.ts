@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
 enum UserRole {
   USER = "user",
@@ -17,12 +17,19 @@ export interface UserDocument extends Document {
   name: string;
   role: UserRole;
   roleVerified: boolean;
+  resumes: Types.ObjectId[];
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
 const userSchema: Schema = new Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  resumes: [{ type: Schema.Types.ObjectId, ref: "Resume" }],
+  password: {
+    type: String,
+    required: function (this: UserDocument) {
+      return !this.googleId;
+    },
+  },
   avatar: { type: String },
   emailVerified: { type: Boolean, default: false },
   provider: { type: String },

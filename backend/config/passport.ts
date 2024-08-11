@@ -48,6 +48,7 @@ passport.use(
         name: profile.displayName,
         googleId: profile.id,
         avatar: profile.photos![0].value,
+        provider: "google",
       });
       return done(null, newUser);
     }
@@ -76,6 +77,7 @@ passport.use(
         name: profile.username,
         githubId: profile.id,
         avatar: profile.photos![0].value,
+        provider: "github",
       });
       return done(null, newUser);
     }

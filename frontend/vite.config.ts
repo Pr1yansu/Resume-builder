@@ -15,16 +15,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: VITE_PORT ? parseInt(VITE_PORT) : 5173,
-      cors: {
-        origin: API_URL,
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
-        allowedHeaders: [
-          "Content-Type",
-          "Authorization",
-          `Access-Control-Allow-Origin`,
-        ],
-        preflightContinue: false,
-      },
+      cors: false,
       proxy: {
         "/api": {
           target: API_URL,

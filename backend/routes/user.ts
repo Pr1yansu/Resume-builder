@@ -15,19 +15,21 @@ router.get(
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login",
+    failureRedirect: process.env.CLIENT_URL! + "/login",
     failureMessage: true,
   }),
   function (req, res) {
-    return res.redirect("/");
+    return res.redirect(`${process.env.CLIENT_URL!}/dashboard`);
   }
 );
 
 router.get(
   "/auth/github/callback",
-  passport.authenticate("github", { failureRedirect: "/login" }),
+  passport.authenticate("github", {
+    failureRedirect: process.env.CLIENT_URL! + "/login",
+  }),
   function (req, res) {
-    res.redirect("/");
+    res.redirect(`${process.env.CLIENT_URL!}/dashboard`);
   }
 );
 

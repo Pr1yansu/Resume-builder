@@ -10,11 +10,17 @@ const Login = () => {
   const [tab, setTab] = useState<"login" | "register">("login");
 
   const handleGoogleSignIn = () => {
-    console.log("Google Sign In");
+    window.open(
+      `${import.meta.env.VITE_API_URL}/api/v1/user/login/google`,
+      "_self"
+    );
   };
 
   const handleGithubSignIn = () => {
-    console.log("Github Sign In");
+    window.open(
+      `${import.meta.env.VITE_API_URL}/api/v1/user/auth/github`,
+      "_self"
+    );
   };
 
   useEffect(() => {

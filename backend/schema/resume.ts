@@ -10,7 +10,6 @@ const resumeNameSlugSchema = new mongoose.Schema({
   slug: {
     type: String,
     required: true,
-    match: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
     minLength: 3,
     maxLength: 100,
   },
@@ -51,7 +50,6 @@ const profileSchema = new mongoose.Schema({
   url: {
     type: String,
     required: true,
-    match: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
   },
   hidden: {
     type: Boolean,
@@ -159,7 +157,6 @@ const projectSchema = new mongoose.Schema({
   },
   url: {
     type: String,
-    match: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
   },
   hidden: {
     type: Boolean,
@@ -238,7 +235,6 @@ const resumeSchema = new mongoose.Schema({
   avatar: {
     url: {
       type: String,
-      match: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
     },
     size: {
       type: Number,
@@ -273,27 +269,24 @@ const resumeSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   },
   website: {
     type: String,
-    match: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/,
   },
   phone: {
     type: String,
-    match: /^\+?[1-9]\d{1,14}$/,
   },
   location: {
     type: String,
     minLength: 2,
     maxLength: 100,
   },
-  customFields: [customFieldSchema],
   summary: {
     type: String,
     minLength: 10,
     maxLength: 1000,
   },
+  customFields: [customFieldSchema],
   profiles: [profileSchema],
   experiences: [experienceSchema],
   skills: [skillSchema],
@@ -314,7 +307,7 @@ const Project = mongoose.model("Project", projectSchema);
 const CustomSection = mongoose.model("CustomSection", customSectionSchema);
 const Education = mongoose.model("Education", educationSchema);
 
-export default {
+export {
   Resume,
   ResumeNameSlug,
   CustomField,

@@ -26,6 +26,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Loader2, Plus } from "lucide-react";
 import React from "react";
+import { useCreateResumeMutation } from "@/services/resume";
 
 const ResumeSchema = z.object({
   name: z
@@ -55,6 +56,7 @@ const ResumeSelectCard = ({
     name: string;
   };
 }) => {
+  const [createResume] = useCreateResumeMutation();
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
   const form = useForm<z.infer<typeof ResumeSchema>>({
@@ -65,10 +67,14 @@ const ResumeSelectCard = ({
     },
   });
 
-  function onSubmit(values: z.infer<typeof ResumeSchema>) {
+  async function onSubmit(values: z.infer<typeof ResumeSchema>) {
     try {
       setLoading(true);
-      console.log(values);
+      const { data, error } = await createResume(values);
+      if (error) {
+        console.error(error);
+        return;
+      }
       navigate("/builder/create");
     } catch (error) {
       console.error(error);

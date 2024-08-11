@@ -2,7 +2,10 @@ import dotenv from "dotenv";
 dotenv.config({
   path: "./.env",
 });
+import { createServer } from "http";
 import express from "express";
+import type { NextFunction, Request, Response } from "express";
+import { Server } from "socket.io";
 import connectDB from "./config/db";
 import cors from "cors";
 import passport from "passport";
@@ -10,15 +13,31 @@ import expressSession from "express-session";
 import morgan from "morgan";
 import MongoStore from "connect-mongo";
 import userRoutes from "./routes/user";
+import resumeRoutes from "./routes/resume";
 import "./config/passport";
 
 connectDB();
 const app = express();
+const httpServer = createServer(app);
 
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST"],
+  },
+});
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+  req.io = io;
+  next();
+});
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (process.env.WHITELIST!.indexOf(origin!) !== -1) {
+      if (
+        !origin ||
+        process.env.WHITELIST!.indexOf(origin.replace(/\/$/, "")) !== -1
+      ) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -60,6 +79,13 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+io.on("connection", (socket) => {
+  console.log("Connected with WS");
+  socket.on("disconnect", () => {
+    console.log("Disconnected");
+  });
+});
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
@@ -69,6 +95,7 @@ app.listen(process.env.PORT, () => {
 });
 
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/resume", resumeRoutes);
 
 process.on("SIGINT", () => {
   console.log("Server is shutting down");
