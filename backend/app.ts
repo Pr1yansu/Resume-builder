@@ -2,10 +2,8 @@ import dotenv from "dotenv";
 dotenv.config({
   path: "./.env",
 });
-import { createServer } from "http";
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
-import { Server } from "socket.io";
 import connectDB from "./config/db";
 import cors from "cors";
 import passport from "passport";
@@ -15,22 +13,15 @@ import MongoStore from "connect-mongo";
 import userRoutes from "./routes/user";
 import resumeRoutes from "./routes/resume";
 import "./config/passport";
+import type { ResumeType } from "./types";
+import { editResumeDetails } from "./controllers/resume";
 
+// Connect to the database
 connectDB();
+
 const app = express();
-const httpServer = createServer(app);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST"],
-  },
-});
-
-app.use((req: Request, res: Response, next: NextFunction) => {
-  req.io = io;
-  next();
-});
+// CORS configuration
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -54,9 +45,11 @@ app.use(
     credentials: true,
   })
 );
-app.use(morgan("dev"));
+
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+
+// Session configuration
 app.use(
   expressSession({
     secret: process.env.SESSION_SECRET as string,
@@ -69,33 +62,30 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      httpOnly: process.env.NODE_ENV === "production",
+      httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24,
-      priority: "high",
     },
     proxy: process.env.NODE_ENV === "production",
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
-
-io.on("connection", (socket) => {
-  console.log("Connected with WS");
-  socket.on("disconnect", () => {
-    console.log("Disconnected");
-  });
-});
+app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  return res.send("Hello World");
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server is running on port ${process.env.PORT}`);
-});
-
+// Routes
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/resume", resumeRoutes);
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 process.on("SIGINT", () => {
   console.log("Server is shutting down");
@@ -108,13 +98,13 @@ process.on("SIGTERM", () => {
 });
 
 process.on("uncaughtException", (err) => {
-  console.error("There was an uncaught error Shutting down the server", err);
+  console.error("There was an uncaught error. Shutting down the server", err);
   process.exit(1);
 });
 
 process.on("unhandledRejection", (err) => {
   console.error(
-    "There was an unhandled rejection Shutting down the server",
+    "There was an unhandled rejection. Shutting down the server",
     err
   );
   process.exit(1);

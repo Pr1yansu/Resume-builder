@@ -8,6 +8,7 @@ const Home = React.lazy(() => import("@/pages/home"));
 const Builder = React.lazy(() => import("@/pages/builder"));
 const Login = React.lazy(() => import("@/pages/login"));
 const Dashboard = React.lazy(() => import("@/pages/dashboard"));
+const PreviewPage = React.lazy(() => import("@/pages/preview"));
 
 const App = () => {
   useEffect(() => {
@@ -72,7 +73,7 @@ const App = () => {
             }
           />
           <Route
-            path="/builder/update"
+            path="/builder/:id"
             element={
               <AuthGuard>
                 <Builder />
@@ -87,6 +88,7 @@ const App = () => {
               </AuthGuard>
             }
           />
+          <Route path="/builder/:resumeId/preview" element={<PreviewPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

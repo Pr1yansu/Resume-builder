@@ -11,29 +11,28 @@ import { DashboardIcon, ListBulletIcon } from "@radix-ui/react-icons";
 import Section from "@/components/ui/section";
 import ResumeSelectCard from "@/components/ui/resume-select-card";
 import { Helmet } from "react-helmet";
-
-const resume = {
-  name: "John Doe",
-};
-
-const ResumeSelectCardType = [
-  {
-    type: "create",
-    className: "bg-gray-200 p-4 rounded-md",
-  },
-  {
-    type: "import",
-    className: "bg-gray-200 p-4 rounded-md",
-  },
-  {
-    type: "update",
-    resume: resume,
-    className: "bg-gray-200 p-4 rounded-md",
-  },
-];
+import { useGetResumesQuery } from "@/services/resume";
 
 const Dashboard = () => {
   const [columnType, setColumnType] = React.useState<"grid" | "list">("grid");
+  const { data, isLoading } = useGetResumesQuery();
+  if (isLoading) return <div>Loading...</div>;
+
+  const ResumeSelectCardType = [
+    {
+      type: "create",
+      className: "bg-gray-200 p-4 rounded-md",
+    },
+    {
+      type: "import",
+      className: "bg-gray-200 p-4 rounded-md",
+    },
+    {
+      type: "update",
+      resume: data?.data,
+      className: "bg-gray-200 p-4 rounded-md",
+    },
+  ];
 
   return (
     <>
@@ -78,7 +77,7 @@ const Dashboard = () => {
                   <ResumeSelectCard
                     key={index}
                     type={card.type as "create" | "import" | "update"}
-                    resume={card.resume}
+                    resume={card.resume?.resumes || []}
                     duration={index}
                     className={card.className}
                   />
@@ -91,7 +90,7 @@ const Dashboard = () => {
                   <ResumeSelectCard
                     key={index}
                     type={card.type as "create" | "import" | "update"}
-                    resume={card.resume}
+                    resume={card.resume?.resumes || []}
                     list
                     duration={index}
                     className={card.className}

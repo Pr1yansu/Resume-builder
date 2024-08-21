@@ -24,28 +24,39 @@ import CustomFieldForm from "./child-forms/custom-field-form";
 import CustomSectionForm from "./child-forms/custom-section-form";
 import EducationForm from "./child-forms/education-form";
 import { resumeSchema } from "./schemas";
+import { Resume } from "@/types";
+import React from "react";
+import { useEditResumeMutation } from "@/services/resume";
 
 export type FormValues = z.infer<typeof resumeSchema>;
 
-const ResumeForm = ({ resume }: { resume?: Partial<FormValues> }) => {
+const ResumeForm = ({
+  resume,
+  onUpdate,
+}: {
+  resume?: Resume;
+  onUpdate: () => void;
+}) => {
+  const [editResume] = useEditResumeMutation();
+
   const form = useForm<FormValues>({
     resolver: zodResolver(resumeSchema),
-    defaultValues: resume || {
-      name: "",
-      headline: "",
-      email: "",
-      website: "",
-      phone: "",
-      location: "",
+    defaultValues: {
+      name: resume?.fullName || "",
+      headline: resume?.headline || "",
+      email: resume?.email || "",
+      website: resume?.website || "",
+      phone: resume?.phone || "",
+      location: resume?.location || "",
       avatar: {
-        url: "",
-        alt: "",
-        size: 100,
-        aspectRatio: "SQUARE",
-        borderRadius: "NONE",
-        effects: "HIDDEN",
+        url: resume?.avatar?.url || "",
+        alt: resume?.avatar?.url || "",
+        size: resume?.avatar?.size || 100,
+        aspectRatio: resume?.avatar?.aspectRatio || "SQUARE",
+        borderRadius: resume?.avatar?.borderRadius || "NONE",
+        effects: resume?.avatar?.effects || "HIDDEN",
       },
-      summary: "",
+      summary: resume?.summary || "",
       customFields: [],
       customSections: [],
       education: [],
@@ -57,12 +68,48 @@ const ResumeForm = ({ resume }: { resume?: Partial<FormValues> }) => {
     },
   });
 
-  const onSubmit = async (values: FormValues) => {
-    console.log(values);
+  const onSubmit = (data: FormValues) => {
+    console.log(data);
   };
 
+  React.useEffect(() => {
+    if (resume?.variant === "blank") {
+      alert(
+        "You are using a blank template. Please select a template to start editing your resume."
+      );
+      return;
+    }
+    const subscription = form.watch((values) => {
+      const debounceUpdate = setTimeout(() => {
+        editResume({
+          resumeId: resume?._id || "",
+          body: {
+            fullName: values.name,
+            headline: values.headline,
+            email: values.email,
+            website: values.website,
+            phone: values.phone,
+            location: values.location,
+            avatar: {
+              url: values.avatar?.url,
+              size: values.avatar?.size,
+              aspectRatio: values.avatar?.aspectRatio,
+              borderRadius: values.avatar?.borderRadius,
+              effects: values.avatar?.effects,
+            },
+            summary: values.summary,
+          },
+        }).then(() => onUpdate());
+      }, 150);
+
+      return () => clearTimeout(debounceUpdate);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, editResume, resume?._id, onUpdate, form, resume?.variant]);
+
   return (
-    <ScrollArea className="h-screen rounded-md border p-4">
+    <ScrollArea className="h-screen rounded-md border p-4 w-full">
       <div className="p-6 w-full">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -219,7 +266,7 @@ const ResumeForm = ({ resume }: { resume?: Partial<FormValues> }) => {
           </form>
         </Form>
         <div className="mt-2 space-y-2">
-          <ProfileForm />
+          <ProfileForm resume={resume} onUpdate={onUpdate} />
           <ExperienceForm />
           <SkillForm />
           <LanguageForm />

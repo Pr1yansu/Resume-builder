@@ -14,6 +14,7 @@ import {
 import User from "../schema/user";
 import type { UserDocument } from "../schema/user";
 import type { NextFunction, Request, Response } from "express";
+import type { ProfileType, ResumeAvatar, ResumeType } from "../types";
 
 export const createResumeNameSlug = catchAsync(
   async (
@@ -84,6 +85,49 @@ export const createResumeNameSlug = catchAsync(
   }
 );
 
+export const getAllResume = catchAsync(async (req: Request, res: Response) => {
+  const resumes = await Resume.find();
+
+  if (!resumes) {
+    return res.status(404).json({
+      status: 404,
+      message: "Resumes not found",
+    });
+  }
+
+  return res.status(200).json({
+    status: 200,
+    data: {
+      resumes,
+    },
+  });
+});
+
+export const getResumeById = catchAsync(
+  async (
+    req: Request<{
+      resumeId: string;
+    }>,
+    res: Response
+  ) => {
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      data: {
+        resume,
+      },
+    });
+  }
+);
+
 export const editResumeDetails = catchAsync(
   async (
     req: Request<
@@ -91,60 +135,218 @@ export const editResumeDetails = catchAsync(
         resumeId: string;
       },
       {},
-      {
-        variant?:
-          | "blank"
-          | "classic"
-          | "modern"
-          | "elegant"
-          | "professional"
-          | "creative";
-        fullName?: string;
-        headline?: string;
-        email?: string;
-        website?: string;
-        location?: string;
-        summary?: string;
-      }
+      ResumeType
     >,
-    res: Response,
-    next: NextFunction
+    res: Response
   ) => {
+    const {
+      fullName,
+      headline,
+      location,
+      email,
+      phone,
+      website,
+      avatar,
+      summary,
+    } = req.body;
+
     const resume = await Resume.findById(req.params.resumeId);
 
     if (!resume) {
-      return res.status(404).send({
+      return res.status(404).json({
         status: 404,
-        message: "Resume Not Found",
+        message: "Resume not found",
       });
     }
 
-    const { email, fullName, headline, location, summary, variant, website } =
-      req.body;
+    const updatedResume = await Resume.findByIdAndUpdate(
+      req.params.resumeId,
+      {
+        fullName,
+        headline,
+        location,
+        email,
+        phone,
+        website,
+        avatar,
+        summary,
+      },
+      { new: true }
+    );
 
-    const updatedResume = await Resume.findByIdAndUpdate(req.params.resumeId, {
-      variant: variant ? variant : "blank",
-      fullName: fullName ? fullName : resume.fullName,
-      email: email ? email : resume.email,
-      headline: headline ? headline : resume.headline,
-      location: location ? location : resume.location,
-      summary: summary ? summary : resume.summary,
-      website: website ? website : resume.website,
-    });
-
-    if (!updatedResume)
-      return res.status(400).json({
-        status: 201,
-        message: "Resume updated failed",
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
       });
+    }
 
-    req.io.emit("edit_resume", {
-      updatedResume,
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const updateResumeVariant = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+      },
+      {},
+      {
+        variant: string;
+      }
+    >,
+    res: Response
+  ) => {
+    const { variant } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    const updatedResume = await Resume.findByIdAndUpdate(
+      req.params.resumeId,
+      {
+        variant,
+      },
+      { new: true }
+    );
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const addProfile = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+      },
+      {},
+      ProfileType
+    >,
+    res: Response
+  ) => {
+    const { network, url, username, hidden } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    resume.profiles.push({
+      network,
+      url,
+      username,
+      hidden,
     });
 
-    return res.status(201).json({
-      status: 201,
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
       message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const updateProfile = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+        profileId: string;
+      },
+      {},
+      ProfileType
+    >,
+    res: Response
+  ) => {
+    const { network, url, username, hidden } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    const profileIndex = resume.profiles.findIndex((profile) => {
+      if (!profile._id) {
+        return false;
+      }
+      return profile._id.toString() === req.params.profileId;
+    });
+
+    if (profileIndex === -1) {
+      return res.status(404).json({
+        status: 404,
+        message: "Profile not found",
+      });
+    }
+
+    resume.profiles[profileIndex] = {
+      network,
+      url,
+      username,
+      hidden,
+    };
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
     });
   }
 );

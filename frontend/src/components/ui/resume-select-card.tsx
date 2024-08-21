@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Plus } from "lucide-react";
 import React from "react";
 import { useCreateResumeMutation } from "@/services/resume";
+import { Resume } from "@/types";
 
 const ResumeSchema = z.object({
   name: z
@@ -41,25 +42,25 @@ const ResumeSchema = z.object({
     .min(3, "Slug is too short"),
 });
 
+type ResumeType = z.infer<typeof ResumeSchema>;
+
 const ResumeSelectCard = ({
   type,
   className,
   duration,
   list = false,
-  resume,
+  resume = [],
 }: {
   type: "create" | "import" | "update";
   className: string;
   duration: number;
   list?: boolean;
-  resume?: {
-    name: string;
-  };
+  resume: Resume[];
 }) => {
   const [createResume] = useCreateResumeMutation();
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
-  const form = useForm<z.infer<typeof ResumeSchema>>({
+  const form = useForm<ResumeType>({
     resolver: zodResolver(ResumeSchema),
     defaultValues: {
       name: "",
@@ -67,10 +68,10 @@ const ResumeSelectCard = ({
     },
   });
 
-  async function onSubmit(values: z.infer<typeof ResumeSchema>) {
+  async function onSubmit(values: ResumeType) {
     try {
       setLoading(true);
-      const { data, error } = await createResume(values);
+      const { error } = await createResume(values);
       if (error) {
         console.error(error);
         return;
@@ -82,11 +83,12 @@ const ResumeSelectCard = ({
       setLoading(false);
     }
   }
-  if (type === "update" && !resume) {
+
+  if (type === "update" && resume.length === 0) {
     return null;
   }
 
-  const CardContent = () => (
+  const CardContent = ({ resume }: { resume?: Resume }) => (
     <div className="flex items-center justify-center">
       {
         {
@@ -122,12 +124,12 @@ const ResumeSelectCard = ({
             }[type]
           }
         </h4>
-        <p className={cn("text-sm text-zinc-600")}>
+        <p className={cn("text-sm text-zinc-600 capitalize")}>
           {
             {
               create: "Create a new resume from scratch",
               import: "Import a resume from a file",
-              update: `Update ${resume?.name}'s resume`,
+              update: `${resume?.resumeNameSlug.name} resume`,
             }[type]
           }
         </p>
@@ -137,12 +139,13 @@ const ResumeSelectCard = ({
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ x: "-100%", scale: list ? 1 : 0.5, opacity: 0 }}
-        animate={{ x: 0, opacity: 1, scale: 1 }}
-        transition={{ duration: duration * 0.5 }}
-      >
-        {type === "import" && (
+      {type === "import" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: duration }}
+        >
           <Dialog>
             <DialogTrigger asChild>
               <div
@@ -172,8 +175,15 @@ const ResumeSelectCard = ({
               </DialogHeader>
             </DialogContent>
           </Dialog>
-        )}
-        {type === "create" && (
+        </motion.div>
+      )}
+      {type === "create" && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: duration }}
+        >
           <Dialog>
             <DialogTrigger asChild>
               <div
@@ -234,10 +244,10 @@ const ResumeSelectCard = ({
                           <FormItem>
                             <FormLabel>Resume Slug</FormLabel>
                             <FormControl>
-                              <Input placeholder="Demon Slug" {...field} />
+                              <Input placeholder="Demo Slug" {...field} />
                             </FormControl>
                             <FormDescription>
-                              This is your Resume's slug.(Anything unique)
+                              This is your Resume's slug (unique identifier).
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -260,10 +270,19 @@ const ResumeSelectCard = ({
               </DialogHeader>
             </DialogContent>
           </Dialog>
-        )}
-        {type === "update" && (
+        </motion.div>
+      )}
+      {resume.map((r) => (
+        <motion.div
+          key={r._id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: duration }}
+        >
           <Link
-            to={"/builder/update"}
+            key={r._id}
+            to={`/builder/${r._id}`}
             className={cn(
               className,
               "flex",
@@ -278,10 +297,10 @@ const ResumeSelectCard = ({
               "relative"
             )}
           >
-            <CardContent />
+            <CardContent resume={r} />
           </Link>
-        )}
-      </motion.div>
+        </motion.div>
+      ))}
     </AnimatePresence>
   );
 };
