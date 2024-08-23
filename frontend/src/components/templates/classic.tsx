@@ -1,6 +1,7 @@
 import { Resume } from "@/types";
-import { Link, PhoneCall } from "lucide-react";
+import { Link, Link2Icon, PhoneCall } from "lucide-react";
 import { Separator } from "../ui/separator";
+import { cn } from "@/lib/utils";
 
 const ClassicTemplate = ({ resume }: { resume: Resume }) => {
   return (
@@ -45,6 +46,62 @@ const ClassicTemplate = ({ resume }: { resume: Resume }) => {
           <Separator className="my-2" />
         </>
       )}
+      <div className="flex justify-between">
+        {resume.profiles && resume.profiles.length > 0 && (
+          <>
+            <div className="w-1/3">
+              <h3 className="text-lg font-semibold text-start">Profiles</h3>
+              <ul className="text-sm text-zinc-700 mt-2 text-center flex justify-between flex-wrap gap-4">
+                {resume.profiles.map((profile, index) => (
+                  <li key={index} className="flex gap-2 items-center">
+                    <a
+                      href={profile.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={cn(profile.url && "text-blue-500")}
+                    >
+                      <Link2Icon size={16} aria-label={profile.username} />{" "}
+                    </a>
+                    <span>{profile.network}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
+        {resume.experiences && resume.experiences.length > 0 && (
+          <>
+            <div>
+              <h3 className="text-lg font-semibold text-end">Experience</h3>
+              <ul className="text-sm text-zinc-700 text-end">
+                {resume.experiences.map((experience, index) => (
+                  <li key={index}>
+                    <div className="text-zinc-700">
+                      <h4 className="text-base font-semibold text-zinc-800">
+                        {experience.title}
+                      </h4>
+                      <p className="text-sm text-zinc-700">
+                        {experience.company} | {experience.location}
+                      </p>
+                      <p className="text-sm text-zinc-700">
+                        {new Date(experience.startDate).toLocaleDateString()} -
+                        {experience.endDate
+                          ? new Date(experience.endDate).toLocaleDateString()
+                          : "Present"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-zinc-700">
+                        {experience.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
+      </div>
     </>
   );
 };

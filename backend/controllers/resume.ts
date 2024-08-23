@@ -13,8 +13,8 @@ import {
 } from "../schema/resume";
 import User from "../schema/user";
 import type { UserDocument } from "../schema/user";
-import type { NextFunction, Request, Response } from "express";
-import type { ProfileType, ResumeAvatar, ResumeType } from "../types";
+import type { Request, Response } from "express";
+import type { ExperienceType, ProfileType, ResumeType } from "../types";
 
 export const createResumeNameSlug = catchAsync(
   async (
@@ -325,12 +325,149 @@ export const updateProfile = catchAsync(
       });
     }
 
-    resume.profiles[profileIndex] = {
-      network,
-      url,
-      username,
-      hidden,
-    };
+    await Resume.findByIdAndUpdate(
+      req.params.resumeId,
+      {
+        $set: {
+          "profiles.$[profile]": {
+            network,
+            url,
+            username,
+            hidden,
+          },
+        },
+      },
+      {
+        arrayFilters: [{ "profile._id": req.params.profileId }],
+      }
+    );
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const addExperience = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+      },
+      {},
+      ExperienceType
+    >,
+    res: Response
+  ) => {
+    const { title, company, location, startDate, endDate, description } =
+      req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    resume.experiences.push({
+      title,
+      company,
+      location,
+      startDate,
+      endDate,
+      description,
+    });
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const updateExperience = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+        experienceId: string;
+      },
+      {},
+      ExperienceType
+    >,
+    res: Response
+  ) => {
+    const { title, company, location, startDate, endDate, description } =
+      req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    const experienceIndex = resume.experiences.findIndex((experience) => {
+      if (!experience._id) {
+        return false;
+      }
+      return experience._id.toString() === req.params.experienceId;
+    });
+
+    if (experienceIndex === -1) {
+      return res.status(404).json({
+        status: 404,
+        message: "Experience not found",
+      });
+    }
+
+    await Resume.findByIdAndUpdate(
+      req.params.resumeId,
+      {
+        $set: {
+          "experiences.$[experience]": {
+            title,
+            company,
+            location,
+            startDate,
+            endDate,
+            description,
+          },
+        },
+      },
+      {
+        arrayFilters: [{ "experience._id": req.params.experienceId }],
+      }
+    );
 
     const updatedResume = await resume.save();
 

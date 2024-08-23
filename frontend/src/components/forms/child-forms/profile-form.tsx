@@ -25,22 +25,23 @@ import {
   useAddProfileMutation,
   useUpdateProfileMutation,
 } from "@/services/resume";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile, Resume } from "@/types";
 import { AlertDialogHeader } from "@/components/ui/alert-dialog";
+import React from "react";
 
-// Separate Add Profile Form Component
 const AddProfileForm = ({
   resumeId,
   onUpdate,
+  setOpen,
 }: {
   resumeId: string;
   onUpdate: () => void;
+  setOpen: (value: boolean) => void;
 }) => {
   const [addProfile] = useAddProfileMutation();
   const { toast, dismiss } = useToast();
-  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -55,7 +56,13 @@ const AddProfileForm = ({
     try {
       const { data, error } = await addProfile({
         resumeId,
-        profile: values,
+        profile: {
+          network: values.network,
+          username: values.username,
+          url: values.url,
+          _id: "",
+          hidden: false,
+        },
       });
 
       if (data) {
@@ -63,7 +70,6 @@ const AddProfileForm = ({
           title: "Success",
           description: "Profile added successfully",
         });
-        navigate(`/resume/${resumeId}`);
         onUpdate();
       } else if (error) {
         toast({
@@ -72,6 +78,7 @@ const AddProfileForm = ({
         });
       }
 
+      setOpen(false);
       form.reset();
     } catch (error) {
       toast({
@@ -133,15 +140,16 @@ const AddProfileForm = ({
   );
 };
 
-// Separate Edit Profile Form Component
 const EditProfileForm = ({
   profile,
   resumeId,
   onUpdate,
+  setOpen,
 }: {
   profile: Profile;
   resumeId: string;
   onUpdate: () => void;
+  setOpen: (value: boolean) => void;
 }) => {
   const [updateProfile] = useUpdateProfileMutation();
   const { toast, dismiss } = useToast();
@@ -159,7 +167,14 @@ const EditProfileForm = ({
     try {
       const { data, error } = await updateProfile({
         resumeId,
-        profile: values,
+        profileId: profile._id,
+        profile: {
+          _id: profile._id,
+          network: values.network,
+          username: values.username,
+          url: values.url,
+          hidden: profile.hidden,
+        },
       });
 
       if (data) {
@@ -168,6 +183,7 @@ const EditProfileForm = ({
           description: "Profile updated successfully",
         });
         onUpdate();
+        setOpen(false);
       } else if (error) {
         toast({
           title: "Error",
@@ -241,6 +257,7 @@ const ProfileForm = ({
   resume?: Resume;
   onUpdate: () => void;
 }) => {
+  const [open, setOpen] = React.useState(false);
   const params = useParams<{ id: string }>();
   const resumeId = params.id || "";
 
@@ -251,9 +268,8 @@ const ProfileForm = ({
       <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 text-center">
         Profiles
       </h4>
-      {/* Section for Displaying and Updating Profiles */}
       {resume?.profiles?.map((profile, index) => (
-        <Dialog key={index}>
+        <Dialog key={index} open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <div className="border-dashed border-2 p-3 flex justify-center items-center gap-2 text-muted-foreground rounded-md cursor-pointer">
               <Pencil size={16} />
@@ -270,6 +286,7 @@ const ProfileForm = ({
                 profile={profile}
                 resumeId={resumeId}
                 onUpdate={onUpdate}
+                setOpen={setOpen}
               />
             </AlertDialogHeader>
           </DialogContent>
@@ -289,7 +306,11 @@ const ProfileForm = ({
             <DialogDescription>
               Add a new profile to your resume.
             </DialogDescription>
-            <AddProfileForm resumeId={resumeId} onUpdate={onUpdate} />
+            <AddProfileForm
+              resumeId={resumeId}
+              onUpdate={onUpdate}
+              setOpen={setOpen}
+            />
           </DialogHeader>
         </DialogContent>
       </Dialog>

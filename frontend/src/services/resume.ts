@@ -9,6 +9,7 @@ import {
   variantUpdate,
   variantUpdateResponse,
   Profile,
+  Experience,
 } from "@/types";
 
 const resumeApi = createApi({
@@ -76,12 +77,34 @@ const resumeApi = createApi({
     }),
     updateProfile: builder.mutation<
       UpdateResumeResponse,
-      { resumeId: string; profile: Profile }
+      { resumeId: string; profileId: string; profile: Profile }
     >({
-      query: ({ resumeId, profile }) => ({
-        url: `/update-profile/${resumeId}`,
+      query: ({ resumeId, profile, profileId }) => ({
+        url: `/update-profile/${resumeId}/${profileId}`,
         method: "PUT",
         body: profile,
+        credentials: "include",
+      }),
+    }),
+    addExperience: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; experience: Experience }
+    >({
+      query: ({ resumeId, experience }) => ({
+        url: `/add-experience/${resumeId}`,
+        method: "PUT",
+        body: experience,
+        credentials: "include",
+      }),
+    }),
+    updateExperience: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; experienceId: string; experience: Experience }
+    >({
+      query: ({ resumeId, experience, experienceId }) => ({
+        url: `/update-experience/${resumeId}/${experienceId}`,
+        method: "PUT",
+        body: experience,
         credentials: "include",
       }),
     }),
@@ -96,6 +119,8 @@ export const {
   useUpdateVariantMutation,
   useAddProfileMutation,
   useUpdateProfileMutation,
+  useAddExperienceMutation,
+  useUpdateExperienceMutation,
 } = resumeApi;
 
 export default resumeApi;

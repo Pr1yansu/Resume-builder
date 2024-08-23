@@ -6,6 +6,9 @@ import {
   getResumeById,
   updateResumeVariant,
   addProfile,
+  updateProfile,
+  addExperience,
+  updateExperience,
 } from "../controllers/resume";
 import { checkAuthenticated } from "../middleware/auth";
 
@@ -21,5 +24,16 @@ router.put(
   updateResumeVariant
 );
 router.put("/add-profile/:resumeId", checkAuthenticated, addProfile);
+router.put(
+  "/update-profile/:resumeId/:profileId",
+  checkAuthenticated,
+  updateProfile
+);
+router.put("/add-experience/:resumeId", checkAuthenticated, addExperience);
+router.put(
+  "/update-experience/:resumeId/:experienceId",
+  checkAuthenticated,
+  updateExperience
+);
 
 export default router;

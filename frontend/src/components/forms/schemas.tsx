@@ -8,12 +8,34 @@ export const profileSchema = z.object({
 });
 
 export const experienceSchema = z.object({
-  title: z.string().min(3).max(100),
-  company: z.string().min(2).max(100),
-  location: z.string().min(2).max(100),
-  startDate: z.date({}),
+  title: z
+    .string()
+    .min(3, {
+      message: "Title must be at least 3 characters long",
+    })
+    .max(100),
+  company: z
+    .string()
+    .min(2, {
+      message: "Company must be at least 2 characters long",
+    })
+    .max(100),
+  location: z
+    .string()
+    .min(2, {
+      message: "Location must be at least 2 characters long",
+    })
+    .max(100),
+  startDate: z.date({
+    message: "Start date is required",
+  }),
   endDate: z.date().optional(),
-  description: z.string().min(10).max(1000),
+  description: z
+    .string()
+    .min(10, {
+      message: "Description must be at least 10 characters long",
+    })
+    .max(1000),
   hidden: z.boolean().optional(),
 });
 

@@ -31,10 +31,10 @@ export interface ProfileType {
   network: string;
   username: string;
   url: string;
-  hidden?: boolean;
+  hidden: boolean;
 }
 
-export interface Experience {
+export interface ExperienceType {
   title: string;
   company: string;
   location: string;
@@ -69,7 +69,7 @@ export interface Project {
 export interface CustomSection {
   title: string;
   hidden?: boolean;
-  items: [CustomField | Experience | Skill | Language | Project];
+  items: [CustomField | ExperienceType | Skill | Language | Project];
 }
 
 export interface Education {
@@ -103,7 +103,7 @@ export interface ResumeType {
   summary?: string;
   customFields?: CustomField[];
   profiles?: ProfileType[];
-  experiences?: Experience[];
+  experiences?: ExperienceType[];
   skills?: Skill[];
   languages?: Language[];
   projects?: Project[];

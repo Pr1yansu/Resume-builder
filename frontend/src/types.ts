@@ -73,6 +73,7 @@ export interface CustomField {
 }
 
 export interface Profile {
+  _id: string;
   network: string;
   username: string;
   url: string;
@@ -80,6 +81,7 @@ export interface Profile {
 }
 
 export interface Experience {
+  _id: string;
   title: string;
   company: string;
   location: string;
