@@ -92,6 +92,7 @@ export interface Experience {
 }
 
 export interface Skill {
+  _id: string;
   name: string;
   description?: string;
   level: "Beginner" | "Intermediate" | "Advanced" | "Expert";

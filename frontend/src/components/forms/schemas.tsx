@@ -40,9 +40,18 @@ export const experienceSchema = z.object({
 });
 
 export const skillSchema = z.object({
-  name: z.string().min(2).max(100),
-  level: z.enum(["Beginner", "Intermediate", "Advanced", "Expert"]),
-  hidden: z.boolean().optional(),
+  name: z
+    .string()
+    .min(2, "Name should have at least 2 characters")
+    .max(100, "Name cannot exceed 100 characters"),
+  level: z.enum(["Beginner", "Intermediate", "Advanced", "Expert"], {
+    required_error: "Level is required",
+  }),
+  description: z
+    .string()
+    .max(255, "Description cannot exceed 255 characters")
+    .optional(),
+  hidden: z.boolean().optional().default(false),
 });
 
 export const languageSchema = z.object({

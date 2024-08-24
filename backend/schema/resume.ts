@@ -298,24 +298,5 @@ const resumeSchema = new mongoose.Schema({
 
 const Resume = mongoose.model("Resume", resumeSchema);
 const ResumeNameSlug = mongoose.model("ResumeNameSlug", resumeNameSlugSchema);
-const CustomField = mongoose.model("CustomField", customFieldSchema);
-const Profile = mongoose.model("Profile", profileSchema);
-const Experience = mongoose.model("Experience", experienceSchema);
-const Skill = mongoose.model("Skill", skillSchema);
-const Language = mongoose.model("Language", languageSchema);
-const Project = mongoose.model("Project", projectSchema);
-const CustomSection = mongoose.model("CustomSection", customSectionSchema);
-const Education = mongoose.model("Education", educationSchema);
 
-export {
-  Resume,
-  ResumeNameSlug,
-  CustomField,
-  Profile,
-  Experience,
-  Skill,
-  Language,
-  Project,
-  CustomSection,
-  Education,
-};
+export { Resume, ResumeNameSlug };

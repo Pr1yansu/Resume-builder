@@ -9,6 +9,12 @@ import {
   updateProfile,
   addExperience,
   updateExperience,
+  addSkill,
+  updateSkill,
+  addEducation,
+  addLanguage,
+  updateEducation,
+  updateLanguage,
 } from "../controllers/resume";
 import { checkAuthenticated } from "../middleware/auth";
 
@@ -34,6 +40,20 @@ router.put(
   "/update-experience/:resumeId/:experienceId",
   checkAuthenticated,
   updateExperience
+);
+router.put("/add-skill/:resumeId", checkAuthenticated, addSkill);
+router.put("/update-skill/:resumeId/:skillId", checkAuthenticated, updateSkill);
+router.put("/add-education/:resumeId", checkAuthenticated, addEducation);
+router.put(
+  "/update-education/:resumeId/:educationId",
+  checkAuthenticated,
+  updateEducation
+);
+router.put("/add-language/:resumeId", checkAuthenticated, addLanguage);
+router.put(
+  "/update-language/:resumeId/:languageId",
+  checkAuthenticated,
+  updateLanguage
 );
 
 export default router;

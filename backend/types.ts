@@ -44,14 +44,14 @@ export interface ExperienceType {
   hidden?: boolean;
 }
 
-export interface Skill {
+export interface SkillType {
   name: string;
   description?: string;
   level: "Beginner" | "Intermediate" | "Advanced" | "Expert";
   hidden?: boolean;
 }
 
-export interface Language {
+export interface LanguageType {
   name: string;
   level: "Basic" | "Conversational" | "Fluent" | "Native";
   hidden?: boolean;
@@ -69,10 +69,10 @@ export interface Project {
 export interface CustomSection {
   title: string;
   hidden?: boolean;
-  items: [CustomField | ExperienceType | Skill | Language | Project];
+  items: [CustomField | ExperienceType | SkillType | LanguageType | Project];
 }
 
-export interface Education {
+export interface EducationType {
   institute: string;
   degree: string;
   fieldOfStudy: string;
@@ -104,9 +104,9 @@ export interface ResumeType {
   customFields?: CustomField[];
   profiles?: ProfileType[];
   experiences?: ExperienceType[];
-  skills?: Skill[];
-  languages?: Language[];
+  skills?: SkillType[];
+  languages?: LanguageType[];
   projects?: Project[];
-  education?: Education[];
+  education?: EducationType[];
   customSections?: CustomSection[];
 }

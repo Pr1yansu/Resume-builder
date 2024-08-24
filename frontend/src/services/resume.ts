@@ -10,6 +10,9 @@ import {
   variantUpdateResponse,
   Profile,
   Experience,
+  Skill,
+  Language,
+  Education,
 } from "@/types";
 
 const resumeApi = createApi({
@@ -35,6 +38,8 @@ const resumeApi = createApi({
       }),
       providesTags: ["Resume"],
     }),
+
+    // Mutations
     createResume: builder.mutation<ResumeNameSlugResponse, ResumeNameSlug>({
       query: (body) => ({
         url: "/create",
@@ -42,17 +47,19 @@ const resumeApi = createApi({
         body,
         credentials: "include",
       }),
+      invalidatesTags: ["Resume"],
     }),
+
     updateVariant: builder.mutation<variantUpdateResponse, variantUpdate>({
       query: (body) => ({
         url: `/update-variant/${body.resumeId}`,
         method: "PUT",
-        body: {
-          variant: body.variant,
-        },
+        body: { variant: body.variant },
         credentials: "include",
       }),
+      invalidatesTags: ["Resume"],
     }),
+
     editResume: builder.mutation<
       UpdateResumeResponse,
       { resumeId: string; body: UpdateResume }
@@ -63,7 +70,9 @@ const resumeApi = createApi({
         body,
         credentials: "include",
       }),
+      invalidatesTags: ["Resume"],
     }),
+
     addProfile: builder.mutation<
       UpdateResumeResponse,
       { resumeId: string; profile: Profile }
@@ -74,18 +83,22 @@ const resumeApi = createApi({
         body: profile,
         credentials: "include",
       }),
+      invalidatesTags: ["Resume"],
     }),
+
     updateProfile: builder.mutation<
       UpdateResumeResponse,
       { resumeId: string; profileId: string; profile: Profile }
     >({
-      query: ({ resumeId, profile, profileId }) => ({
+      query: ({ resumeId, profileId, profile }) => ({
         url: `/update-profile/${resumeId}/${profileId}`,
         method: "PUT",
         body: profile,
         credentials: "include",
       }),
+      invalidatesTags: ["Resume"],
     }),
+
     addExperience: builder.mutation<
       UpdateResumeResponse,
       { resumeId: string; experience: Experience }
@@ -96,17 +109,98 @@ const resumeApi = createApi({
         body: experience,
         credentials: "include",
       }),
+      invalidatesTags: ["Resume"],
     }),
+
     updateExperience: builder.mutation<
       UpdateResumeResponse,
       { resumeId: string; experienceId: string; experience: Experience }
     >({
-      query: ({ resumeId, experience, experienceId }) => ({
+      query: ({ resumeId, experienceId, experience }) => ({
         url: `/update-experience/${resumeId}/${experienceId}`,
         method: "PUT",
         body: experience,
         credentials: "include",
       }),
+      invalidatesTags: ["Resume"],
+    }),
+
+    addSkill: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; skill: Skill }
+    >({
+      query: ({ resumeId, skill }) => ({
+        url: `/add-skill/${resumeId}`,
+        method: "PUT",
+        body: skill,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Resume"],
+    }),
+
+    updateSkill: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; skillId: string; skill: Skill }
+    >({
+      query: ({ resumeId, skillId, skill }) => ({
+        url: `/update-skill/${resumeId}/${skillId}`,
+        method: "PUT",
+        body: skill,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Resume"],
+    }),
+
+    addLanguage: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; language: Language }
+    >({
+      query: ({ resumeId, language }) => ({
+        url: `/add-language/${resumeId}`,
+        method: "PUT",
+        body: language,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Resume"],
+    }),
+
+    updateLanguage: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; languageId: string; language: Language }
+    >({
+      query: ({ resumeId, languageId, language }) => ({
+        url: `/update-language/${resumeId}/${languageId}`,
+        method: "PUT",
+        body: language,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Resume"],
+    }),
+
+    addEducation: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; education: Education }
+    >({
+      query: ({ resumeId, education }) => ({
+        url: `/add-education/${resumeId}`,
+        method: "PUT",
+        body: education,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Resume"],
+    }),
+
+    updateEducation: builder.mutation<
+      UpdateResumeResponse,
+      { resumeId: string; educationId: string; education: Education }
+    >({
+      query: ({ resumeId, educationId, education }) => ({
+        url: `/update-education/${resumeId}/${educationId}`,
+        method: "PUT",
+        body: education,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Resume"],
     }),
   }),
 });
@@ -121,6 +215,12 @@ export const {
   useUpdateProfileMutation,
   useAddExperienceMutation,
   useUpdateExperienceMutation,
+  useAddSkillMutation,
+  useUpdateSkillMutation,
+  useAddLanguageMutation,
+  useUpdateLanguageMutation,
+  useAddEducationMutation,
+  useUpdateEducationMutation,
 } = resumeApi;
 
 export default resumeApi;

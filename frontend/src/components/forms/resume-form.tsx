@@ -267,13 +267,13 @@ const ResumeForm = ({
         </Form>
         <div className="mt-2 space-y-2">
           <ProfileForm resume={resume} onUpdate={onUpdate} />
-          <ExperienceForm resume={resume} onUpdate={onUpdate} />
-          <SkillForm />
+          <SkillForm resume={resume} onUpdate={onUpdate} />
           <LanguageForm />
           <ProjectForm />
+          <EducationForm />
+          <ExperienceForm resume={resume} onUpdate={onUpdate} />
           <CustomFieldForm />
           <CustomSectionForm />
-          <EducationForm />
         </div>
       </div>
     </ScrollArea>

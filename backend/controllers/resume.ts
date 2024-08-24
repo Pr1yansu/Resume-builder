@@ -1,20 +1,16 @@
 import { catchAsync } from "../lib/error";
-import {
-  CustomField,
-  CustomSection,
-  Education,
-  Experience,
-  Language,
-  Profile,
-  Project,
-  Resume,
-  ResumeNameSlug,
-  Skill,
-} from "../schema/resume";
+import { Resume, ResumeNameSlug } from "../schema/resume";
 import User from "../schema/user";
 import type { UserDocument } from "../schema/user";
 import type { Request, Response } from "express";
-import type { ExperienceType, ProfileType, ResumeType } from "../types";
+import type {
+  EducationType,
+  ExperienceType,
+  LanguageType,
+  ProfileType,
+  ResumeType,
+  SkillType,
+} from "../types";
 
 export const createResumeNameSlug = catchAsync(
   async (
@@ -466,6 +462,389 @@ export const updateExperience = catchAsync(
       },
       {
         arrayFilters: [{ "experience._id": req.params.experienceId }],
+      }
+    );
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const addSkill = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+      },
+      {},
+      SkillType
+    >,
+    res: Response
+  ) => {
+    const { level, name, description, hidden } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    resume.skills.push({
+      level,
+      name,
+      description,
+      hidden,
+    });
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const updateSkill = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+        skillId: string;
+      },
+      {},
+      SkillType
+    >,
+    res: Response
+  ) => {
+    const { level, name, description, hidden } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    const skillIndex = resume.skills.findIndex((skill) => {
+      if (!skill._id) {
+        return false;
+      }
+      return skill._id.toString() === req.params.skillId;
+    });
+
+    if (skillIndex === -1) {
+      return res.status(404).json({
+        status: 404,
+        message: "Skill not found",
+      });
+    }
+
+    await Resume.findByIdAndUpdate(
+      req.params.resumeId,
+      {
+        $set: {
+          "skills.$[skill]": {
+            level,
+            name,
+            description,
+            hidden,
+          },
+        },
+      },
+      {
+        arrayFilters: [{ "skill._id": req.params.skillId }],
+      }
+    );
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const addEducation = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+      },
+      {},
+      EducationType
+    >,
+    res: Response
+  ) => {
+    const {
+      degree,
+      description,
+      endDate,
+      fieldOfStudy,
+      institute,
+      startDate,
+      hidden,
+    } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    resume.education.push({
+      degree,
+      description,
+      endDate,
+      fieldOfStudy,
+      institute,
+      startDate,
+      hidden,
+    });
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const updateEducation = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+        educationId: string;
+      },
+      {},
+      EducationType
+    >,
+    res: Response
+  ) => {
+    const {
+      degree,
+      description,
+      endDate,
+      fieldOfStudy,
+      institute,
+      startDate,
+      hidden,
+    } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    const educationIndex = resume.education.findIndex((education) => {
+      if (!education._id) {
+        return false;
+      }
+      return education._id.toString() === req.params.educationId;
+    });
+
+    if (educationIndex === -1) {
+      return res.status(404).json({
+        status: 404,
+        message: "Education not found",
+      });
+    }
+
+    await Resume.findByIdAndUpdate(
+      req.params.resumeId,
+      {
+        $set: {
+          "education.$[education]": {
+            degree,
+            description,
+            endDate,
+            fieldOfStudy,
+            institute,
+            startDate,
+            hidden,
+          },
+        },
+      },
+      {
+        arrayFilters: [{ "education._id": req.params.educationId }],
+      }
+    );
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const addLanguage = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+      },
+      {},
+      LanguageType
+    >,
+    res: Response
+  ) => {
+    const { level, name, hidden } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    resume.languages.push({
+      level,
+      name,
+      hidden,
+    });
+
+    const updatedResume = await resume.save();
+
+    if (!updatedResume) {
+      return res.status(500).json({
+        status: 500,
+        message: "Resume not updated",
+      });
+    }
+
+    return res.status(200).json({
+      status: 200,
+      message: "Resume updated",
+      data: {
+        resume: updatedResume,
+      },
+    });
+  }
+);
+
+export const updateLanguage = catchAsync(
+  async (
+    req: Request<
+      {
+        resumeId: string;
+        languageId: string;
+      },
+      {},
+      LanguageType
+    >,
+    res: Response
+  ) => {
+    const { level, name, hidden } = req.body;
+
+    const resume = await Resume.findById(req.params.resumeId);
+
+    if (!resume) {
+      return res.status(404).json({
+        status: 404,
+        message: "Resume not found",
+      });
+    }
+
+    const languageIndex = resume.languages.findIndex((language) => {
+      if (!language._id) {
+        return false;
+      }
+      return language._id.toString() === req.params.languageId;
+    });
+
+    if (languageIndex === -1) {
+      return res.status(404).json({
+        status: 404,
+        message: "Language not found",
+      });
+    }
+
+    await Resume.findByIdAndUpdate(
+      req.params.resumeId,
+      {
+        $set: {
+          "languages.$[language]": {
+            level,
+            name,
+            hidden,
+          },
+        },
+      },
+      {
+        arrayFilters: [{ "language._id": req.params.languageId }],
       }
     );
 
