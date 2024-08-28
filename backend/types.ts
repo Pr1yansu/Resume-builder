@@ -28,6 +28,7 @@ export interface CustomField {
 }
 
 export interface ProfileType {
+  icon: string;
   network: string;
   username: string;
   url: string;

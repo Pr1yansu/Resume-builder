@@ -78,6 +78,7 @@ export interface Profile {
   username: string;
   url: string;
   hidden?: boolean;
+  icon: string;
 }
 
 export interface Experience {
@@ -140,7 +141,7 @@ export interface Resume {
     | "professional"
     | "creative";
   resumeNameSlug: ResumeNameSlug;
-  user?: string; // ObjectId type, usually represented as a string in TypeScript
+  user?: string;
   avatar?: ResumeAvatar;
   fullName?: string;
   headline?: string;

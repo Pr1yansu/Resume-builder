@@ -1,10 +1,29 @@
 import * as z from "zod";
 
 export const profileSchema = z.object({
-  network: z.string().min(2).max(100),
-  username: z.string().min(2).max(100),
-  url: z.string().url(),
+  network: z
+    .string({
+      required_error: "Network is required",
+    })
+    .min(2)
+    .max(100),
+  username: z
+    .string({
+      required_error: "Username is required",
+    })
+    .min(2)
+    .max(100),
+  url: z
+    .string({
+      required_error: "URL is required",
+    })
+    .url({
+      message: "Add HTTP or HTTPS to the URL",
+    }),
   hidden: z.boolean().optional(),
+  icon: z.string({
+    required_error: "Icon is required",
+  }),
 });
 
 export const experienceSchema = z.object({

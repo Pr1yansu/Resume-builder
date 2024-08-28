@@ -2,31 +2,15 @@ import { Resume } from "@/types";
 import { Button } from "../ui/button";
 import { Copy, Download, Share } from "lucide-react";
 import ClassicTemplate from "../templates/classic";
-// @ts-expect-error - no types available
-import html2pdf from "html2pdf.js";
+import React from "react";
+import { ScrollArea } from "../ui/scroll-area";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Preview = ({ resume }: { resume?: Resume }) => {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const downloadResume = async () => {
-    try {
-      const element = document.getElementById("resume-preview");
-      element?.style.setProperty("width", "21cm", "important");
-      if (element) {
-        await html2pdf()
-          .from(element)
-          .set({
-            filename: `${resume?.fullName || "resume"}.pdf`,
-            image: { quality: 0.98, type: "png" },
-            html2canvas: { scale: 2 },
-            jsPDF: { format: "letter", orientation: "portrait" },
-          })
-          .save();
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      const element = document.getElementById("resume-preview");
-      element?.style.setProperty("width", "650px", "important");
-    }
+    navigate(`${pathname}/preview`);
   };
 
   if (!resume)
@@ -37,20 +21,16 @@ const Preview = ({ resume }: { resume?: Resume }) => {
   return (
     <div className=" flex justify-center items-center">
       {resume.variant === "blank" && (
-        <div
-          id="resume-preview"
-          className="w-[650px] h-[830px] bg-white shadow-md p-8"
-        />
+        <div className="w-[650px] h-[830px] bg-white shadow-md p-8" />
       )}
       {resume.variant === "classic" && (
-        <div
+        <ScrollArea
           id="resume-preview"
-          className="w-[650px] h-[830px] bg-white shadow-md p-6"
+          className="w-[650px] h-[830px] bg-white shadow-md p-6 rounded-md"
         >
           <ClassicTemplate resume={resume} />
-        </div>
+        </ScrollArea>
       )}
-
       <div className="absolute bottom-4 right-4 flex gap-2">
         <Button size="icon" onClick={downloadResume}>
           <Download className="h-4 w-4" />
@@ -60,7 +40,7 @@ const Preview = ({ resume }: { resume?: Resume }) => {
             navigator.share({
               title: "Resume",
               text: "Check out my resume",
-              url: window.location.href + "/preview",
+              url: pathname + "/preview",
             });
           }}
           size="icon"
@@ -69,7 +49,7 @@ const Preview = ({ resume }: { resume?: Resume }) => {
         </Button>
         <Button
           onClick={() => {
-            navigator.clipboard.writeText(window.location.href + "/preview");
+            navigator.clipboard.writeText(pathname + "/preview");
           }}
           size="icon"
         >

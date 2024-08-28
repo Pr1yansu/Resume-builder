@@ -247,7 +247,7 @@ export const addProfile = catchAsync(
     >,
     res: Response
   ) => {
-    const { network, url, username, hidden } = req.body;
+    const { network, url, username, hidden, icon } = req.body;
 
     const resume = await Resume.findById(req.params.resumeId);
 
@@ -263,6 +263,7 @@ export const addProfile = catchAsync(
       url,
       username,
       hidden,
+      icon,
     });
 
     const updatedResume = await resume.save();

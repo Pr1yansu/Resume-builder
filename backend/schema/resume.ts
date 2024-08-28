@@ -35,6 +35,10 @@ const customFieldSchema = new mongoose.Schema({
 });
 
 const profileSchema = new mongoose.Schema({
+  icon: {
+    type: String,
+    required: true,
+  },
   network: {
     type: String,
     required: true,
@@ -283,7 +287,6 @@ const resumeSchema = new mongoose.Schema({
   },
   summary: {
     type: String,
-    minLength: 10,
     maxLength: 1000,
   },
   customFields: [customFieldSchema],

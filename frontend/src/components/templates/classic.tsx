@@ -1,7 +1,8 @@
 import { Resume } from "@/types";
-import { Link, Link2Icon, PhoneCall } from "lucide-react";
+import { Link, PhoneCall } from "lucide-react";
 import { Separator } from "../ui/separator";
 import { cn } from "@/lib/utils";
+import { IconPickerItem } from "react-icons-picker";
 
 const ClassicTemplate = ({ resume }: { resume: Resume }) => {
   return (
@@ -60,7 +61,11 @@ const ClassicTemplate = ({ resume }: { resume: Resume }) => {
                       rel="noreferrer"
                       className={cn(profile.url && "text-blue-500")}
                     >
-                      <Link2Icon size={16} aria-label={profile.username} />{" "}
+                      <IconPickerItem
+                        value={profile.icon}
+                        size={14}
+                        color="#000000"
+                      />
                     </a>
                     <span>{profile.network}</span>
                   </li>

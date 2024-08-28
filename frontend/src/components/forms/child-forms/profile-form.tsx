@@ -30,6 +30,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Profile, Resume } from "@/types";
 import { AlertDialogHeader } from "@/components/ui/alert-dialog";
 import React from "react";
+import IconPicker from "react-icons-picker";
 
 const AddProfileForm = ({
   resumeId,
@@ -49,6 +50,7 @@ const AddProfileForm = ({
       network: "",
       username: "",
       url: "",
+      icon: "",
     },
   });
 
@@ -62,6 +64,7 @@ const AddProfileForm = ({
           url: values.url,
           _id: "",
           hidden: false,
+          icon: values.icon,
         },
       });
 
@@ -121,19 +124,46 @@ const AddProfileForm = ({
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>URL</FormLabel>
-              <FormControl>
-                <Input placeholder="https://your-profile.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex gap-2">
+          <FormField
+            control={form.control}
+            name="icon"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Icon</FormLabel>
+                <FormControl>
+                  <IconPicker
+                    value={field.value}
+                    onChange={field.onChange}
+                    pickButtonStyle={{
+                      width: "40px",
+                      height: "40px",
+                      border: "1px solid #e5e7eb",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      borderRadius: "0.375rem",
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://your-profile.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type="submit">Submit</Button>
       </form>
     </Form>
@@ -154,16 +184,21 @@ const EditProfileForm = ({
   const [updateProfile] = useUpdateProfileMutation();
   const { toast, dismiss } = useToast();
 
+  const [isIconPickerOpen, setIsIconPickerOpen] = React.useState(false);
+
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       network: profile.network,
       username: profile.username,
       url: profile.url,
+      icon: profile.icon,
     },
   });
 
   const handleSubmit = async (values: z.infer<typeof profileSchema>) => {
+    if (isIconPickerOpen) return; // Prevent submission if icon picker is open
+
     try {
       const { data, error } = await updateProfile({
         resumeId,
@@ -174,6 +209,7 @@ const EditProfileForm = ({
           username: values.username,
           url: values.url,
           hidden: profile.hidden,
+          icon: values.icon,
         },
       });
 
@@ -231,19 +267,49 @@ const EditProfileForm = ({
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>URL</FormLabel>
-              <FormControl>
-                <Input placeholder="https://your-profile.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex gap-2">
+          <FormField
+            control={form.control}
+            name="icon"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Icon</FormLabel>
+                <FormControl>
+                  <IconPicker
+                    value={field.value}
+                    onChange={(value) => {
+                      field.onChange(value);
+                      setIsIconPickerOpen(true);
+                    }}
+                    pickButtonStyle={{
+                      width: "40px",
+                      height: "40px",
+                      border: "1px solid #e5e7eb",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      borderRadius: "0.375rem",
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>URL</FormLabel>
+                <FormControl>
+                  <Input placeholder="https://your-profile.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type="submit">Update Profile</Button>
       </form>
     </Form>
